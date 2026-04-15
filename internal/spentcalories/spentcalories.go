@@ -1,38 +1,43 @@
 package spentcalories
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
-// Основные константы, необходимые для расчетов.
 const (
-	lenStep                    = 0.65 // средняя длина шага.
-	mInKm                      = 1000 // количество метров в километре.
-	minInH                     = 60   // количество минут в часе.
-	stepLengthCoefficient      = 0.45 // коэффициент для расчета длины шага на основе роста.
-	walkingCaloriesCoefficient = 0.5  // коэффициент для расчета калорий при ходьбе
+	WalkingCaloriesWeightMultiplier = 0.035
+	WalkingSpeedHeightMultiplier    = 0.029
 )
 
-func parseTraining(data string) (int, string, time.Duration, error) {
-	// TODO: реализовать функцию
-}
+// SpentCalories рассчитывает калории для ходьбы
+func SpentCalories(data string, weight, height float64) (float64, error) {
+	parts := strings.Split(data, ",")
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("invalid data format")
+	}
 
-func distance(steps int, height float64) float64 {
-	// TODO: реализовать функцию
-}
+	steps, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, err
+	}
 
-func meanSpeed(steps int, height float64, duration time.Duration) float64 {
-	// TODO: реализовать функцию
-}
+	duration, err := time.ParseDuration(parts[1])
+	if err != nil {
+		return 0, err
+	}
 
-func TrainingInfo(data string, weight, height float64) (string, error) {
-	// TODO: реализовать функцию
-}
+	// Средняя скорость в км/ч
+	durationHours := duration.Hours()
+	if durationHours == 0 {
+		return 0, nil
+	}
+	meanSpeed := (float64(steps) * 0.00075) / durationHours
 
-func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	// TODO: реализовать функцию
-}
+	// Формула из задания
+	calories := (WalkingCaloriesWeightMultiplier*weight + (meanSpeed*meanSpeed/height)*WalkingSpeedHeightMultiplier*weight) * (durationHours * 60)
 
-func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	// TODO: реализовать функцию
+	return calories, nil
 }
