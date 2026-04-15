@@ -40,6 +40,6 @@ func DayActionInfo(data string, weight, height float64) string {
 
 	dist := float64(steps) * StepLength
 
-	return fmt.Sprintf("Количество шагов: %d. Дистанция: %.2f км. Время в пути: %.2f ч.",
+	return fmt.Sprintf("Количество шагов: %d. Дистанция: %.2f км. Время в пути: %.2f ч",
 		steps, dist, duration.Hours())
 }

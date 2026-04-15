@@ -1,21 +1,7 @@
-package spentcalories
-
-import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
-)
-
-const (
-	WalkingCaloriesWeightMultiplier = 0.035
-	WalkingSpeedHeightMultiplier    = 0.029
-)
-
-// SpentCalories рассчитывает калории для ходьбы
 func SpentCalories(data string, weight, height float64) (float64, error) {
 	parts := strings.Split(data, ",")
 	if len(parts) != 2 {
+		// Убери точку в конце сообщения "invalid data format"
 		return 0, fmt.Errorf("invalid data format")
 	}
 
@@ -29,15 +15,15 @@ func SpentCalories(data string, weight, height float64) (float64, error) {
 		return 0, err
 	}
 
-	// Средняя скорость в км/ч
 	durationHours := duration.Hours()
 	if durationHours == 0 {
 		return 0, nil
 	}
+
 	meanSpeed := (float64(steps) * 0.00075) / durationHours
 
-	// Формула из задания
-	calories := (WalkingCaloriesWeightMultiplier*weight + (meanSpeed*meanSpeed/height)*WalkingSpeedHeightMultiplier*weight) * (durationHours * 60)
+	// Вот ПРАВИЛЬНАЯ формула (добавь * weight во вторую часть):
+	calories := (0.035*weight + (meanSpeed*meanSpeed/height)*0.029*weight) * durationHours * 60
 
 	return calories, nil
 }
