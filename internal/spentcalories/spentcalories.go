@@ -1,41 +1,28 @@
-package spentcalories
-
-import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
-)
-
-const stepLength = 0.00075 // км
-
 func SpentCalories(data string, weight, height float64) (float64, error) {
 	parts := strings.Split(data, ",")
 	if len(parts) != 2 {
-		return 0, fmt.Errorf("invalid data format")
+		return 0, fmt.Errorf("invalid data format") // БЕЗ ТОЧКИ
 	}
 
-	stepsStr := strings.TrimSpace(parts[0])
-	durationStr := strings.TrimSpace(parts[1])
-
-	steps, err := strconv.Atoi(stepsStr)
+	steps, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, fmt.Errorf("invalid steps: %w", err)
+		return 0, err
 	}
 
-	duration, err := time.ParseDuration(durationStr)
+	duration, err := time.ParseDuration(parts[1])
 	if err != nil {
-		return 0, fmt.Errorf("invalid duration: %w", err)
+		return 0, err
 	}
 
 	durationHours := duration.Hours()
-	if durationHours <= 0 {
-		return 0, fmt.Errorf("duration must be greater than zero")
+	if durationHours == 0 {
+		return 0, nil
 	}
 
-	meanSpeed := (float64(steps) * stepLength) / durationHours
+	meanSpeed := (float64(steps) * 0.00075) / durationHours
 
-	calories := (0.035*weight + (meanSpeed*meanSpeed/height)*0.029*weight) * durationHours * 60
+	// Правильная формула: вес должен быть в обоих слагаемых
+	calories := (WalkingCaloriesWeightMultiplier*weight + (meanSpeed*meanSpeed/height)*WalkingSpeedHeightMultiplier*weight) * durationHours * 60
 
 	return calories, nil
 }
